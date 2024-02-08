@@ -39,7 +39,6 @@ describe("tests v1/images/search API", () => {
       cy.log(response.body);
     });
   });
-
   it("confirms 'has_breeds' query parameter returns expected or commonly-used fields", () => {
     cy.request({
       url: apiPath + "?has_breeds=true",
@@ -47,14 +46,15 @@ describe("tests v1/images/search API", () => {
     }).then((response) => {
       testSearchApiResponses(response);
     });
+  });
 
-    it("confirms 'breed_ids' query parameter returns expected or commonly-used fields", () => {
-      cy.request({
-        url: apiPath + "?breed_ids=beng",
-        headers: { "x-api-key": apiKey },
-      }).then((response) => {
-        testSearchApiResponses(response);
-      });
+  it("confirms invalid 'breed_ids' query parameter value returns expected results", () => {
+    cy.request({
+      url: apiPath + "?breed_ids=invalid",
+      headers: { "x-api-key": apiKey },
+    }).then((response) => {
+      expect(response.status).to.eq(200);
+      expect(response.body).to.be.empty;
     });
   });
 });

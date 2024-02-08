@@ -48,4 +48,30 @@ describe("tests v1/images/upload API and deletion", () => {
       expect(response.status).to.eq(204);
     });
   });
+
+  it("Confirms valid x-api-key parameter is required for local image upload", () => {
+    // test setup almost identical to happy path
+    apiPath = "/v1/images/upload";
+    cy.fixture("scottishFold.jpg", "binary").then((file) => {
+      //Create a unique id using a timestamp
+      const now = new Date();
+      cypressTimestamp = "cypressInvalid-" + now.toISOString();
+      //construct form data
+      const blob = Cypress.Blob.binaryStringToBlob(file, "image/jpeg");
+      const formData = new FormData();
+      formData.append("file", blob, "scottishFold.jpg");
+      formData.append("sub_id", cypressTimestamp);
+      formData.append("breed_ids", "sfol");
+      //send the request
+      cy.request({
+        method: "POST",
+        url: apiPath,
+        body: formData,
+        headers: { "x-api-key": "invalidKey", "content-type": "multipart/form-data" },
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(401);
+      });
+    });
+  });
 });
