@@ -1,4 +1,5 @@
 /// <reference types="cypress" />
+import { testSearchApiResponses } from "../page-objects/commonTests.js";
 
 const apiKey = Cypress.env("thecatapi_key");
 const apiPath = "/v1/images/search";
@@ -44,38 +45,16 @@ describe("tests v1/images/search API", () => {
       url: apiPath + "?has_breeds=true",
       headers: { "x-api-key": apiKey },
     }).then((response) => {
-      expect(response.status).to.eq(200);
-      expect(response.body[0]).to.have.keys("height", "id", "url", "width", "breeds");
-      expect(response.body[0].breeds[0]).to.include.keys("description", "id", "name", "reference_image_id", "weight", "wikipedia_url");
-      expect(response.body[0].breeds[0].description).to.be.a("string");
-      expect(response.body[0].breeds[0].id).to.be.a("string");
-      expect(response.body[0].breeds[0].name).to.be.a("string");
-      expect(response.body[0].breeds[0].reference_image_id).to.be.a("string");
-      expect(response.body[0].breeds[0].wikipedia_url).to.match(/^https?:\/\/\S+\.wikipedia\.org\/wiki\/\S+/i);
-      expect(response.body[0].breeds[0].weight).to.have.keys("imperial", "metric");
-      expect(response.body[0].breeds[0].weight.imperial).to.be.a("string");
-      expect(response.body[0].breeds[0].weight.metric).to.be.a("string");
+      testSearchApiResponses(response);
     });
-  });
 
-  it.only("confirms 'breed_ids' query parameter returns expected or commonly-used fields", () => {
-    cy.request({
-      url: apiPath + "?breed_ids=beng",
-      headers: { "x-api-key": apiKey },
-    }).then((response) => {
-      expect(response.status).to.eq(200);
-      cy.log(response.body);
-      // Work in progress - move these to a POM function
-      expect(response.body[0]).to.have.keys("height", "id", "url", "width", "breeds");
-      expect(response.body[0].breeds[0]).to.include.keys("description", "id", "name", "reference_image_id", "weight", "wikipedia_url");
-      expect(response.body[0].breeds[0].description).to.be.a("string");
-      expect(response.body[0].breeds[0].id).to.be.a("string");
-      expect(response.body[0].breeds[0].name).to.be.a("string");
-      expect(response.body[0].breeds[0].reference_image_id).to.be.a("string");
-      expect(response.body[0].breeds[0].wikipedia_url).to.match(/^https?:\/\/\S+\.wikipedia\.org\/wiki\/\S+/i);
-      expect(response.body[0].breeds[0].weight).to.have.keys("imperial", "metric");
-      expect(response.body[0].breeds[0].weight.imperial).to.be.a("string");
-      expect(response.body[0].breeds[0].weight.metric).to.be.a("string");
+    it("confirms 'breed_ids' query parameter returns expected or commonly-used fields", () => {
+      cy.request({
+        url: apiPath + "?breed_ids=beng",
+        headers: { "x-api-key": apiKey },
+      }).then((response) => {
+        testSearchApiResponses(response);
+      });
     });
   });
 });
